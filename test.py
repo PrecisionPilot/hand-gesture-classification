@@ -1,8 +1,11 @@
 import numpy as np
+import math
 
-array1 = np.array([[0, 1], [2, 3], [4, 5], [6, 7]])
-array2 = np.array([[7, 6], [5, 4], [3, 2], [1, 0]])
+def normalize_vector(nd_arr: np.ndarray) -> np.ndarray:
+    vector_length = sum([i ** 2 for i in nd_arr]) ** 0.5
+    normalized_arr = [i / vector_length for i in nd_arr]
+    return normalized_arr
 
-combined = np.vstack((array1, array2))
-
-print(type(array1[0]))
+arr = np.array([[3, 4], [5, 3]])
+noramlized_arr = [normalize_vector(row) for row in arr]
+print(noramlized_arr)
