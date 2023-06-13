@@ -39,7 +39,7 @@ print(f"input size {block_size * columns}")
 
 
 # replace variable with local path in linux
-PATH = "classifier_2.pt"
+PATH = "classifier.pt"
 
 ###Load Existing Model
 model = NeuralNetwork().to(device)
