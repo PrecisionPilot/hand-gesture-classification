@@ -19,7 +19,7 @@ print(f"Device in use: {device}")
 class NeuralNetwork(nn.Module):
     def __init__(self):
         super().__init__()
-        #self.flatten = nn.Flatten()
+        # self.flatten = nn.Flatten()
         self.linear_relu_stack = nn.Sequential(
             nn.Linear(block_size * columns, 256), # input
             nn.ReLU(),
@@ -32,7 +32,7 @@ class NeuralNetwork(nn.Module):
         )
 
     def forward(self, x):
-        #x = self.flatten(x)
+        # x = self.flatten(x)
         logits = self.linear_relu_stack(x)
         return logits
 print(f"input size {block_size * columns}")
@@ -41,7 +41,7 @@ print(f"input size {block_size * columns}")
 # replace variable with local path in linux
 PATH = "classifier.pt"
 
-###Load Existing Model
+### Load Existing Model
 model = NeuralNetwork().to(device)
 model.load_state_dict(torch.load(PATH))
 model.eval() # must set dropout and batch normalization layers to evaluation mode
