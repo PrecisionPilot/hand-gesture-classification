@@ -45,6 +45,8 @@ PATH = "classifier.pt"
 ### Load Existing Model
 model = NeuralNetwork().to(device)
 model.load_state_dict(torch.load(PATH))
+optimizer = torch.optim.Adam()
+optimizer.load_state_dict(torch.load(PATH))
 model.eval() # must set dropout and batch normalization layers to evaluation mode
 
 print("finished running")
