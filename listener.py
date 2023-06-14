@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import rospy
-import numpy np
+import numpy as np
 from sensor_msgs.msg import JointState
 
 import math
@@ -47,7 +47,7 @@ PATH = "classifier.pt"
 ### Load Existing Model
 model = NeuralNetwork().to(device)
 model.load_state_dict(torch.load(PATH))
-optimizer = torch.optim.Adam(model.parameters, lr=0.001)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 optimizer.load_state_dict(torch.load(PATH))
 model.eval() # must set dropout and batch normalization layers to evaluation mode
 
