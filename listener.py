@@ -15,6 +15,11 @@ def listener():
     # run simultaneously.
     rospy.init_node('listener', anonymous=True)
     rospy.Subscriber('/senseglove/0/rh/joint_states', JointState, callback) # subscribes to this senseglove joints topic
+    
+    # In ROS, the jointstate.velocity field in a sensor_msgs/JointState message
+    # represents the velocities of the joints at a particular time.
+    # It is not an array that accumulates over time
+    
     arr = np.array(JointState.velocity)
     print("--------------------------------------------")
     print(JointState.velocity)
@@ -22,8 +27,10 @@ def listener():
     print(arr.shape)
     print("--------------------------------------------")
     arr = np.ndarray.flatten(arr)
-    # spin() simply keeps python from exiting until this node is stopped
-    # rospy.spin()
+    # spin() simply keeps python from exiting until this node is stopped.
+    # It does not interrupt the execution of the program
+    
+    rospy.spin()
     #y_pred = model(arr) # scalar
     #print(y_pred)
 
