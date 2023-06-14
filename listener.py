@@ -1,7 +1,59 @@
 #!/usr/bin/env python3
 import rospy
-import numpy as np
+import numpy np
 from sensor_msgs.msg import JointState
+
+import math
+import pandas as pd
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+import torch
+from torch import nn
+import torch.optim
+import os
+
+block_size = 24
+columns = 20
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Device in use: {device}")
+
+class NeuralNetwork(nn.Module):
+    def __init__(self):
+        super().__init__()
+        # self.flatten = nn.Flatten()
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(block_size * columns, 256), # input
+            nn.ReLU(),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Linear(128, 64),
+            nn.ReLU(),
+            nn.Linear(64, 1),
+            nn.Sigmoid()
+        )
+
+    def forward(self, x):
+        # x = self.flatten(x)
+        logits = self.linear_relu_stack(x)
+        return logits
+
+print(f"input size {block_size * columns}")
+
+
+# replace variable with local path in linux
+PATH = "classifier.pt"
+
+### Load Existing Model
+model = NeuralNetwork().to(device)
+model.load_state_dict(torch.load(PATH))
+optimizer = torch.optim.Adam()
+optimizer.load_state_dict(torch.load(PATH))
+model.eval() # must set dropout and batch normalization layers to evaluation mode
+
+print("finished loading model")
+
+
 
 def callback(data):
     rospy.loginfo(rospy.get_caller_id() + 'I heard %s', data.velocity)
@@ -22,17 +74,22 @@ def listener():
     
     arr = np.array(JointState.velocity)
     print("--------------------------------------------")
-    print(JointState.velocity)
     print(type(arr))
+    print(arr.shape) # not iterable?
+    
+    arr = np.ndarray.flatten(arr)
     print(arr.shape)
     print("--------------------------------------------")
-    arr = np.ndarray.flatten(arr)
     # spin() simply keeps python from exiting until this node is stopped.
     # It does not interrupt the execution of the program
-    
+    y_pred = model(arr) # 1 or 0
+    print(y_pred)
+
+
+
     rospy.spin()
-    #y_pred = model(arr) # scalar
-    #print(y_pred)
+    # no code goes after this
+    
 
 if __name__ == '__main__':
     listener()
