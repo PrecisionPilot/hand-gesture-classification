@@ -14,6 +14,7 @@ import os
 
 block_size = 24
 columns = 20
+print(f"input size {block_size * columns}")
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Device in use: {device}")
@@ -38,7 +39,7 @@ class NeuralNetwork(nn.Module):
         logits = self.linear_relu_stack(x)
         return logits
 
-print(f"input size {block_size * columns}")
+
 
 
 # replace variable with local path in linux
@@ -50,13 +51,19 @@ model.load_state_dict(torch.load(PATH))
 optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
 optimizer.load_state_dict(torch.load(PATH))
 model.eval() # must set dropout and batch normalization layers to evaluation mode
-
 print("finished loading model")
 
 
 
-def callback(data):
-    rospy.loginfo(rospy.get_caller_id() + 'I heard %s', data.velocity)
+def data_intake(data):
+    # 0 = rotating
+    # 1 = grasping
+    arr = np.array(data.velocity)
+    arr = np.ndarray.flatten(arr)
+    y_pred = model(arr) 
+    print(y_pred)
+    rospy.loginfo(rospy.get_caller_id(), 'the hand motion predicted is %s', y_pred)
+    
 
 
 def listener():
@@ -66,30 +73,20 @@ def listener():
     # name for our 'listener' node so that multiple listeners can
     # run simultaneously.
     rospy.init_node('listener', anonymous=True)
-    rospy.Subscriber('/senseglove/0/rh/joint_states', JointState, callback) # subscribes to this senseglove joints topic
-    
+
     # In ROS, the jointstate.velocity field in a sensor_msgs/JointState message
     # represents the velocities of the joints at a particular time.
     # It is not an array that accumulates over time
-    
-    arr = np.array(JointState.velocity)
-    print("--------------------------------------------")
-    print(type(arr))
-    print(arr.shape) # not iterable?
-    
-    arr = np.ndarray.flatten(arr)
-    print(arr.shape)
-    print("--------------------------------------------")
+    # subscribes to this senseglove joints topic
+    # every time new message is received, passes joint state into data_intake function.abs
+    rospy.Subscriber('/senseglove/0/rh/joint_states', JointState, data_intake)
+
     # spin() simply keeps python from exiting until this node is stopped.
     # It does not interrupt the execution of the program
-    y_pred = model(arr) # 1 or 0
-    print(y_pred)
-
-
-
     rospy.spin()
     # no code goes after this
     
+
 
 if __name__ == '__main__':
     listener()
