@@ -1,0 +1,10 @@
+~/Documents/SenseGlove-API/SenseCom/SenseCom
+sudo chmod 666 /dev/ttyACM0
+~/Documents/senseglove_ros_ws/src/senseglove/senseglove_launch/launch
+
+Build Ros package using: catkin_make
+run: "senseglove_demo.launch"
+Print joints: rostopic echo /senseglove/0/rh/joint_states
+
+Next step: ros python subscriber
+- Everything you do should be in the callback
